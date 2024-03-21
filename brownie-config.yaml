@@ -1,0 +1,10 @@
+compiler:
+  solc:
+    version: 0.8.13
+# automatically fetch contract sources from Etherscan
+autofetch_sources: True
+dotenv: .env
+networks:
+  default: bevm-test
+wallets:
+  from_key: ${PRIVATE_KEY}
