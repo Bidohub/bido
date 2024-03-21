@@ -24,7 +24,7 @@ import "./interfaces/IStBTC.sol";
  *
  */
 contract WstBTC is ERC20Permit {
-    IStBTC public stBTC;
+    IStBTC public immutable stBTC;
 
     /**
      * @param _stBTC address of the StBTC token to wrap

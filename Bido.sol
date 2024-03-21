@@ -3,18 +3,17 @@
 pragma solidity ^0.8.0;
 
 import "./common/UnstructuredStorage.sol";
-import "./common/Math256.sol";
 import "../openzeppelin-contracts/contracts/access/Ownable.sol";
 import "../openzeppelin-contracts/contracts/utils/math/SafeMath.sol";
 
-import "./StBTCPermit.sol";
+import "./StBTC.sol";
 
 /**
  * @title Liquid staking pool implementation
  *
  * Bido is an BEVM liquid staking protocol
  */
-contract Bido is StBTCPermit, Ownable {
+contract Bido is StBTC, Ownable {
     using UnstructuredStorage for bytes32;
     using SafeMath for uint256;
 
@@ -134,7 +133,6 @@ contract Bido is StBTCPermit, Ownable {
         require(!BIDO_PAUSED_POSITION.getStorageBool(), "STAKING_PAUSED");
 
         uint256 totalPooledBtc = _getTotalPooledBtc();
-        require(totalPooledBtc > msg.value, "INVALID_VALUE");
         uint256 preTotalPooledBtc = totalPooledBtc.sub(msg.value);
 
         uint256 sharesAmount = msg.value.mul(_getTotalShares()).div(
@@ -154,7 +152,7 @@ contract Bido is StBTCPermit, Ownable {
      */
     function _unstake(uint256 _amount) internal {
         require(!BIDO_PAUSED_POSITION.getStorageBool(), "STAKING_PAUSED");
-        require(_amount > 0, "UNSTAKE_ZERO");
+        require(_amount != 0, "UNSTAKE_ZERO");
 
         uint256 sharesAmount;
         if (_amount == MAX_INT) {
@@ -163,7 +161,7 @@ contract Bido is StBTCPermit, Ownable {
             sharesAmount = getSharesByPooledBtc(_amount);
         }
 
-        require(sharesAmount > 0, "BURN_ZERO");
+        require(sharesAmount != 0, "BURN_ZERO");
 
         (, uint256 preRebaseTokenAmount) = _burnShares(
             msg.sender,
@@ -172,7 +170,7 @@ contract Bido is StBTCPermit, Ownable {
 
         _sendValue(msg.sender, preRebaseTokenAmount);
 
-        emit UnStaked(msg.sender, msg.value);
+        emit UnStaked(msg.sender, preRebaseTokenAmount);
     }
 
     /**
